@@ -88,9 +88,23 @@ function getBooks(req, h) {
     }
   }
 
+  const bookList = [];
+
+  books.map((d) => {
+    const { id, name, publisher } = d;
+
+    bookList.push({
+      id,
+      name,
+      publisher,
+    });
+  });
+
   const response = h.response({
     status: 'success',
-    data: books,
+    data: {
+      books: bookList,
+    },
   });
   response.code(200);
 
@@ -98,9 +112,9 @@ function getBooks(req, h) {
 }
 
 function getBooksById(req, h) {
-  const data = books.filter((n) => n.id === req.params.id);
+  const book = books.filter((n) => n.id === req.params.id);
 
-  if (data.length < 1) {
+  if (book.length < 1) {
     const response = h.response({
       status: 'fail',
       message: 'Buku tidak ditemukan',
@@ -113,7 +127,9 @@ function getBooksById(req, h) {
 
   const response = h.response({
     status: 'success',
-    data,
+    data: {
+      book: book[0],
+    },
   });
 
   response.code(200);
@@ -131,6 +147,7 @@ function addBooks(req, h) {
     pageCount,
     readPage,
     reading,
+    finished,
   } = req.payload;
 
   if (name === undefined || name === '') {
@@ -154,8 +171,8 @@ function addBooks(req, h) {
   }
 
   const id = nanoid(16);
-  const createdAt = new Date().toISOString();
-  const updatedAt = createdAt;
+  const insertedAt = new Date().toISOString();
+  const updatedAt = insertedAt;
 
   const bookArray = {
     id,
@@ -167,7 +184,8 @@ function addBooks(req, h) {
     pageCount,
     readPage,
     reading,
-    createdAt,
+    finished,
+    insertedAt,
     updatedAt,
   };
 
@@ -178,8 +196,9 @@ function addBooks(req, h) {
   if (isSuccess) {
     const response = h.response({
       status: 'success',
+      message: 'Buku berhasil ditambahkan',
       data: {
-        noteId: id,
+        bookId: id,
       },
     });
     response.code(201);
@@ -226,6 +245,7 @@ function updateBooks(req, h) {
     pageCount,
     readPage,
     reading,
+    finished,
   } = req.payload;
 
   if (name === undefined || name === '') {
@@ -265,12 +285,13 @@ function updateBooks(req, h) {
       pageCount,
       readPage,
       reading,
+      finished,
       updatedAt,
     };
 
     const response = h.response({
       status: 'success',
-      message: 'Catatan berhasil diperbarui',
+      message: 'Buku berhasil diperbarui',
     });
     response.code(200);
     return response;
