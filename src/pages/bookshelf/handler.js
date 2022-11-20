@@ -147,7 +147,6 @@ function addBooks(req, h) {
     pageCount,
     readPage,
     reading,
-    finished,
   } = req.payload;
 
   if (name === undefined || name === '') {
@@ -173,6 +172,7 @@ function addBooks(req, h) {
   const id = nanoid(16);
   const insertedAt = new Date().toISOString();
   const updatedAt = insertedAt;
+  const finished = (pageCount - readPage) < 1;
 
   const bookArray = {
     id,
@@ -245,13 +245,12 @@ function updateBooks(req, h) {
     pageCount,
     readPage,
     reading,
-    finished,
   } = req.payload;
 
   if (name === undefined || name === '') {
     const response = h.response({
       status: 'fail',
-      message: 'Gagal update buku. Mohon isi nama buku',
+      message: 'Gagal memperbarui buku. Mohon isi nama buku',
     });
     response.code(400);
 
@@ -261,7 +260,7 @@ function updateBooks(req, h) {
   if (readPage > pageCount) {
     const response = h.response({
       status: 'fail',
-      message: 'Gagal update buku. readPage tidak boleh lebih besar dari pageCount',
+      message: 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount',
     });
     response.code(400);
 
@@ -270,7 +269,7 @@ function updateBooks(req, h) {
 
   const { id } = req.params;
   const updatedAt = new Date().toISOString();
-  console.log(id);
+  const finished = (pageCount - readPage) < 1;
 
   const index = books.findIndex((book) => book.id === id);
 
@@ -299,7 +298,7 @@ function updateBooks(req, h) {
 
   const response = h.response({
     status: 'fail',
-    message: 'Gagal Update Buku. ID tidak ditemukan',
+    message: 'Gagal memperbarui buku. Id tidak ditemukan',
   });
   response.code(404);
   return response;
